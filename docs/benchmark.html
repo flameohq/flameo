@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flameo | Benchmarks</title>
+<link rel="icon" type="image/svg+xml" href="flameo_flame.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Kanit:wght@600&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --ink: #10231D;
+  --ink-2: #293832;
+  --muted: #55655F;
+  --line: #DDE8E2;
+  --soft: #EAF1EC;
+  --deep: #10231D;
+  --cyan: #6BE3BF;
+  --sky: #6BB9E3;
+  --g1: #5EDB60;
+  --g2: #6BE3BF;
+  --g3: #6BB9E3;
+  --grad: linear-gradient(120deg, var(--g1) 0%, var(--g2) 50%, var(--g3) 100%);
+  --paper: #FFFFFF;
+  --wash: #EAF1EC;
+  --code: #F5FAFE;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 92px; }
+::selection { background: #C8F5CC; }
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Segoe UI", Lato, system-ui, -apple-system, sans-serif;
+  font-size: 16.5px;
+  line-height: 1.7;
+  background:
+    radial-gradient(900px 540px at 110% -10%, rgba(107, 227, 191, .3), transparent 60%),
+    radial-gradient(760px 500px at -10% 10%, rgba(107, 185, 227, .16), transparent 55%),
+    var(--paper);
+}
+a { color: var(--deep); text-decoration: none; }
+a:hover { color: var(--ink); text-decoration: underline; text-decoration-color: var(--g2); }
+h1, h2, h3, h4 { line-height: 1.15; letter-spacing: -.01em; }
+p { color: var(--muted); }
+ul { color: var(--muted); padding-left: 20px; }
+li { margin: 7px 0; }
+strong { color: var(--ink); }
+code { font-family: "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size: .92em; }
+p code, li code, td code {
+  background: var(--soft);
+  color: var(--ink);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+/* Nav */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: rgba(255, 255, 255, .88);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--line);
+}
+.nav-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+.brand { display: flex; align-items: center; gap: 10px; color: var(--ink); font-family: "Kanit", sans-serif; font-weight: 600; font-size: 1.4em; }
+.brand:hover { text-decoration: none; color: var(--ink); }
+.brand-logo {
+  width: 34px; height: 34px;
+  display: block;
+  object-fit: contain;
+}
+.nav-links { display: flex; flex-wrap: wrap; gap: 2px; margin-left: auto; }
+.nav-links a {
+  color: var(--muted);
+  font-size: .84rem;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+.nav-links a:hover, .nav-links a.active {
+  color: var(--ink);
+  background: var(--soft);
+  text-decoration: none;
+}
+.nav-cta {
+  padding: 8px 16px;
+  border-radius: 9px;
+  background: var(--ink);
+  color: #fff;
+  font-size: .85rem;
+  font-weight: 600;
+}
+.nav-cta:hover { background: var(--grad); color: #0C1A15; text-decoration: none; }
+
+/* Hero */
+.hero {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 60px 24px 60px;
+  display: grid;
+  grid-template-columns: 1.02fr .98fr;
+  gap: 56px;
+  align-items: center;
+}
+.eyebrow {
+  color: var(--deep);
+  font-size: .76rem;
+  font-weight: 700;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+}
+.hero h1 {
+  margin: 8px 0 16px;
+  font-family: "Kanit", sans-serif;
+  font-size: clamp(3.2rem, 7vw, 5.6rem);
+  font-weight: 600;
+  letter-spacing: -.035em;
+}
+.hero h1 em {
+  font-style: normal;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.tagline { color: var(--deep); font-size: clamp(1.35rem, 2.6vw, 1.9rem); font-weight: 600; line-height: 1.4; margin: 0 0 16px; }
+.hero-copy p { max-width: 560px; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+.install {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 20px;
+  padding: 10px 12px 10px 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--wash);
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .95rem;
+}
+.install b { color: var(--deep); font-weight: 700; }
+.install .copy-btn { margin-left: 0; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-size: .95rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+  transition: all .2s ease;
+}
+.btn-primary { background: var(--ink); color: #fff; box-shadow: 0 10px 24px rgba(16, 35, 29, .18); }
+.btn-primary:hover { background: var(--grad); color: #0C1A15; text-decoration: none; transform: translateY(-2px); }
+.btn-ghost { background: #fff; color: var(--ink); border-color: var(--line); }
+.btn-ghost:hover { border-color: var(--g3); color: var(--ink); text-decoration: none; transform: translateY(-2px); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+.chip {
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--ink);
+  font-size: .78rem;
+  font-weight: 600;
+}
+
+/* Code panels */
+.code-panel {
+  background: var(--code);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 18px 40px rgba(16, 35, 29, .08);
+}
+.code-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 14px;
+  background: rgba(16, 35, 29, .03);
+  border-bottom: 1px solid var(--line);
+}
+.dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(255, 255, 255, .28); }
+.dot:nth-child(1) { background: var(--g1); }
+.dot:nth-child(2) { background: var(--g2); }
+.dot:nth-child(3) { background: var(--g3); }
+.code-title {
+  margin-left: 6px;
+  color: var(--muted);
+  font: 12px/1 "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.copy-btn {
+  margin-left: auto;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--muted);
+  border-radius: 6px;
+  padding: 4px 9px;
+  font: 11px/1 "Segoe UI", sans-serif;
+  cursor: pointer;
+}
+.copy-btn:hover { color: var(--deep); border-color: var(--g2); background: rgba(107, 227, 191, .12); }
+.code-panel pre {
+  position: relative;
+  margin: 0;
+  padding: 20px 18px;
+  overflow: auto;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: var(--ink);
+  font: 16px/1.65 "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.code-panel pre::before { display: none; }
+.tabs { display: flex; gap: 4px; }
+.tab {
+  font: 600 12px "Segoe UI", sans-serif;
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+.tab.on { background: #fff; color: var(--deep); box-shadow: 0 0 0 1px var(--line); }
+.code-block { position: relative; }
+.code-block .code-copy { position: absolute; top: 26px; right: 14px; z-index: 2; }
+pre {
+  position: relative;
+  margin: 18px 0;
+  padding: 20px 18px;
+  overflow: auto;
+  background: var(--code);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  font: 14px/1.65 "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  box-shadow: 0 12px 28px rgba(16, 35, 29, .08);
+}
+pre::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 8px;
+  left: 14px;
+  font: 10px/1 "Segoe UI", sans-serif;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--deep);
+  opacity: .8;
+}
+.kw { color: #B42318; }
+.str { color: #0A7B4B; }
+.com { color: #7A8B84; font-style: italic; }
+.dec { color: #0C6FB1; }
+.num { color: #9A5B00; }
+.fn { color: #5B3FB5; }
+
+/* Sections */
+.section { max-width: 1180px; margin: 0 auto; padding: 68px 24px; }
+.section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+.section h2 { margin: 6px 0 0; font-size: clamp(1.75rem, 3.4vw, 2.5rem); color: var(--ink); }
+.section .lede { max-width: 760px; margin: 0 0 26px; }
+.rule { height: 1px; background: var(--line); }
+.grid { display: grid; gap: 16px; }
+.grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.card {
+  position: relative;
+  overflow: hidden;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 8px 24px rgba(16, 35, 29, .06);
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 3px;
+  background: var(--grad);
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+.card:hover { transform: translateY(-4px); border-color: rgba(107, 227, 191, .6); box-shadow: 0 16px 36px rgba(16, 35, 29, .12); }
+.card:hover::before { opacity: 1; }
+.card h3 { margin: 0 0 8px; font-size: 1.05rem; color: var(--ink); }
+.card p { margin: 0; font-size: .93rem; }
+.card .num-badge {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-bottom: 12px;
+  border-radius: 9px;
+  background: rgba(107, 227, 191, .2);
+  color: var(--ink);
+  font-weight: 800;
+  font-size: .85rem;
+}
+.feature { display: flex; gap: 13px; align-items: flex-start; }
+.feature-icon {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: rgba(107, 227, 191, .16);
+  font-size: 1.05rem;
+}
+.feature h3 { margin: 2px 0 4px; }
+
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+.db-types { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 20px; }
+.db-type {
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--wash);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: .82rem;
+  font-weight: 700;
+}
+.callout {
+  border-left: 3px solid var(--g2);
+  padding: 12px 0 12px 16px;
+  color: var(--muted);
+  margin: 22px 0;
+}
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--line); }
+th { color: var(--deep); text-transform: uppercase; letter-spacing: .1em; font-size: .74rem; }
+td { color: var(--muted); font-size: .93rem; }
+tr:last-child td { border-bottom: 0; }
+.link-list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.link-list a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  font-weight: 600;
+  font-size: .93rem;
+  transition: all .2s ease;
+}
+.link-list a:hover { border-color: var(--g2); background: var(--wash); text-decoration: none; }
+.link-list a::after { content: "→"; color: var(--g3); }
+
+footer {
+  border-top: 1px solid var(--line);
+  background: var(--wash);
+}
+.footer-brand { font-family: "Kanit", sans-serif; font-weight: 600; }
+.footer-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 30px 24px 40px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+@media (max-width: 1000px) {
+  .hero, .split { grid-template-columns: 1fr; }
+  .hero { padding-top: 54px; gap: 34px; }
+  .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .nav-inner { flex-wrap: wrap; }
+  .nav-links {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 2px;
+  }
+  .nav-links a { white-space: nowrap; }
+}
+@media (max-width: 680px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .test-card-center { max-width: 100%; }
+  .section { padding: 48px 20px; }
+  .hero { padding: 40px 20px 44px; }
+  .nav-inner { padding: 10px 20px; }
+  .section-head { display: block; }
+}
+
+
+/* Benchmark page */
+.table-wrap { overflow-x: auto; }
+.card.table-card { padding: 6px 10px; }
+.table-card th, .table-card td { text-align: center; }
+.table-card th:first-child, .table-card td:first-child { text-align: left; }
+.num-cell { text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; }
+details {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  padding: 16px 20px;
+  margin: 18px 0;
+  box-shadow: 0 8px 24px rgba(16, 35, 29, .06);
+}
+details summary {
+  cursor: pointer;
+  color: var(--ink);
+  font-weight: 700;
+  font-size: .96rem;
+}
+details[open] summary { margin-bottom: 12px; }
+details pre { margin: 0; }
+.bench-stat { display: flex; align-items: baseline; gap: 8px; }
+.bench-stat strong { font-family: "Kanit", sans-serif; font-size: clamp(1.9rem, 4vw, 2.8rem); line-height: 1; }
+.bench-stat span { color: var(--muted); font-size: .85rem; }
+.test-card h3 { margin-top: 0; }
+.test-card p { margin-bottom: 0; }
+.test-card-center { grid-column: 1 / -1; justify-self: center; width: 100%; max-width: calc(50% - 8px); }
+.template-copy { margin: 0; }
+@media (max-width: 1000px) {
+  .hero { grid-template-columns: 1fr; }
+}
+
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="nav-inner">
+    <a class="brand" href="./index.html"><img class="brand-logo" src="flameo_flame.svg" alt="">Flameo</a>
+    <div class="nav-links">
+      <a href="./index.html#why">Overview</a>
+      <a href="./index.html#quick-start">Quick Start</a>
+      <a href="./documentation.html">Documentation</a>
+      <a class="active" href="./benchmark.html">Benchmark</a>
+    </div>
+    <a class="nav-cta" href="https://github.com/HqShiblu/hyperloop-test">GitHub</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="hero-copy">
+    <h1>Flameo<em>.</em></h1>
+    <p class="tagline">Average of three 300-connection runs.</p>
+    <p>Flameo, FastAPI, Robyn and Sanic measured on the same PostgreSQL 16 dataset, Python 3.12, 30-second scenarios and a 32 KB JSON payload.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#rps">Requests per second</a>
+      <a class="btn btn-ghost" href="#latency">Latency</a>
+    </div>
+    <div class="chips">
+      <span class="chip">3 runs averaged</span>
+      <span class="chip">300 connections</span>
+      <span class="chip">30s per scenario</span>
+      <span class="chip">PostgreSQL 16</span>
+      <span class="chip">Python 3.12</span>
+    </div>
+  </div>
+  <div class="code-panel">
+    <div class="code-head">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="code-title">run.sh</span>
+      <button class="copy-btn" type="button">Copy</button>
+    </div>
+<pre data-lang="bash"><code>python -m benchmarks.run \
+  --duration 30 \
+  --connections 300 \
+  --threads 2
+</code></pre>
+  </div>
+</header>
+
+<main>
+
+<section class="section" id="how">
+  <div class="eyebrow">Methodology</div>
+  <h2>How the benchmark was run.</h2>
+  <div class="grid grid-4" style="margin-top: 24px;">
+    <div class="card"><div class="num-badge">01</div><h3>GitHub Actions</h3><p>Ubuntu runner with PostgreSQL 16 and Python 3.12.</p></div>
+    <div class="card"><div class="num-badge">02</div><h3>Load</h3><p>300 concurrent connections, 2 <code>wrk</code> threads, 30s per scenario and a 3s warmup.</p></div>
+    <div class="card"><div class="num-badge">03</div><h3>Servers</h3><p>Granian 2.5.4 with one worker for Flameo RSGI, Flameo ASGI, FastAPI and Sanic. Robyn runs on its native server.</p></div>
+    <div class="card"><div class="num-badge">04</div><h3>Average</h3><p>Arithmetic mean of 3 completed runs.</p></div>
+  </div>
+</section>
+
+<section class="section" id="rps">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">Throughput</div>
+      <h2>Average requests per second</h2>
+    </div>
+  </div>
+  <p class="lede">Higher is better. Each cell is the arithmetic mean of 3 runs at 300 connections.</p>
+  <div class="card table-card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Framework</th><th><a href="#simple_json">Simple JSON</a></th><th><a href="#payload">Large JSON</a></th><th><a href="#single_row">Single Row<br/>with Select Query</a></th><th><a href="#list_rows">List Rows<br/>with Select Query</a></th><th><a href="#template">HTML Template</a></th></tr></thead>
+        <tbody>
+<tr><td><strong>Flameo</strong> (RSGI with granian)</td><td class="num-cell">40,608</td><td class="num-cell">18,649</td><td class="num-cell">4,281</td><td class="num-cell">3,578</td><td class="num-cell">3,628</td></tr><tr><td><strong>Flameo</strong> (ASGI with granian)</td><td class="num-cell">36,542</td><td class="num-cell">16,464</td><td class="num-cell">4,002</td><td class="num-cell">3,345</td><td class="num-cell">3,489</td></tr><tr><td><strong>FastAPI</strong> (ASGI with granian)</td><td class="num-cell">11,422</td><td class="num-cell">505</td><td class="num-cell">2,929</td><td class="num-cell">1,753</td><td class="num-cell">3,273</td></tr><tr><td><strong>Robyn</strong> (native Rust server) *</td><td class="num-cell">6,432</td><td class="num-cell">5,123</td><td class="num-cell">2,874</td><td class="num-cell">2,389</td><td class="num-cell">2,677</td></tr><tr><td><strong>Sanic</strong> (ASGI with granian)</td><td class="num-cell">12,455</td><td class="num-cell">4,584</td><td class="num-cell">3,255</td><td class="num-cell">2,616</td><td class="num-cell">3,164</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="callout"><b>Flameo</b> leads in every scenario.<br/><code>*</code> Robyn is not an ASGI application and cannot be served by Granian. It runs on its own Rust server.</p>
+</section>
+
+<section class="section" id="latency">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">Latency</div>
+      <h2>Average latency (p50 / p99)</h2>
+    </div>
+  </div>
+  <p class="lede">Lower is better. Each cell shows the mean p50 / p99 latency across 3 runs.</p>
+  <div class="card table-card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Framework</th><th><a href="#simple_json">Simple JSON</a></th><th><a href="#payload">Large JSON</a></th><th><a href="#single_row">Single Row<br/>with Select Query</a></th><th><a href="#list_rows">List Rows<br/>with Select Query</a></th><th><a href="#template">HTML Template</a></th></tr></thead>
+        <tbody>
+<tr><td><strong>Flameo</strong> (RSGI with granian)</td><td class="num-cell">7.76ms / 13.49ms</td><td class="num-cell">17.50ms / 29.14ms</td><td class="num-cell">74.03ms / 332.57ms</td><td class="num-cell">88.38ms / 401.94ms</td><td class="num-cell">84.64ms / 109.29ms</td></tr><tr><td><strong>Flameo</strong> (ASGI with granian)</td><td class="num-cell">8.45ms / 17.48ms</td><td class="num-cell">19.88ms / 31.31ms</td><td class="num-cell">79.94ms / 396.42ms</td><td class="num-cell">94.91ms / 485.46ms</td><td class="num-cell">88.27ms / 111.26ms</td></tr><tr><td><strong>FastAPI</strong> (ASGI with granian)</td><td class="num-cell">28.67ms / 36.70ms</td><td class="num-cell">599.29ms / 810.89ms</td><td class="num-cell">107.06ms / 477.67ms</td><td class="num-cell">176.02ms / 694.85ms</td><td class="num-cell">94.28ms / 119.63ms</td></tr><tr><td><strong>Robyn</strong> (native Rust server) *</td><td class="num-cell">49.29ms / 61.66ms</td><td class="num-cell">61.17ms / 71.76ms</td><td class="num-cell">109.78ms / 133.80ms</td><td class="num-cell">131.91ms / 189.10ms</td><td class="num-cell">116.05ms / 140.01ms</td></tr><tr><td><strong>Sanic</strong> (ASGI with granian)</td><td class="num-cell">26.67ms / 41.90ms</td><td class="num-cell">66.93ms / 90.64ms</td><td class="num-cell">93.89ms / 434.84ms</td><td class="num-cell">115.36ms / 551.53ms</td><td class="num-cell">97.45ms / 124.00ms</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="tests">
+  <div class="eyebrow">Test suite</div>
+  <h2>The five tests.</h2>
+  <div class="grid grid-2" style="margin-top: 24px;">
+    <div class="card test-card" id="simple_json">
+      <div class="num-badge">01</div>
+      <h3>Simple JSON</h3>
+      <p><code>GET /json</code> returns <code>{"message":"Hello, world!"}</code>.</p>
+    </div>
+    <div class="card test-card">
+      <div class="num-badge">02</div>
+      <h3>Large JSON</h3>
+      <p><code>GET /json/nested</code> returns the 33,611-byte nested payload shown below.</p>
+    </div>
+    <div class="card test-card" id="single_row">
+      <div class="num-badge">03</div>
+      <h3>Single Select Query</h3>
+      <p><code>GET /db/employee/5</code> runs the single-row join and returns one employee row.</p>
+<pre data-lang="sql"><code>SELECT E.id, E.name, D.name AS department_name,
+E.contact_no FROM employee E
+JOIN department D ON D.id = E.department_id
+WHERE E.id = 5;</code></pre>
+    </div>
+    <div class="card test-card" id="list_rows">
+      <div class="num-badge">04</div>
+      <h3>List Select Query</h3>
+      <p><code>GET /db/employees</code> runs the same join with <code>LIMIT 20</code> and returns 20 rows.</p>
+<pre data-lang="sql"><code>SELECT E.id, E.name, D.name AS department_name,
+E.contact_no FROM employee E
+JOIN department D ON D.id = E.department_id
+ORDER BY E.id
+LIMIT 20;</code></pre>
+    </div>
+    <div class="card test-card test-card-center">
+      <div class="num-badge">05</div>
+      <h3>HTML Template</h3>
+      <p><code>GET /html</code> renders a light theme with two string variables and a <code>count</code> of 100, looping 100 times.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="template">
+  <div class="split">
+    <div>
+      <div class="eyebrow">Template</div>
+      <h2>Two strings. One number. 100 rows.</h2>
+      <p>The template is shared by every framework. It receives <code>title</code> and <code>subtitle</code> as strings and <code>count = 100</code> as a number.</p>
+      <p><a href="../benchmarks/template.html">Open benchmarks/template.html</a></p>
+      <ul>
+        <li><code>title</code>: Modern UI, rendered fast</li>
+        <li><code>subtitle</code>: A light theme template with two strings and a 100-row loop.</li>
+        <li><code>count</code>: 100</li>
+        <li>Loop: <code>for i in range(1, count + 1)</code></li>
+      </ul>
+    </div>
+    <div class="code-panel">
+      <div class="code-head">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="code-title">template.html</span>
+        <button class="copy-btn" type="button">Copy</button>
+      </div>
+<pre data-lang="html"><code>&lt;h1&gt;{{ title }}&lt;/h1&gt;
+&lt;p class=&quot;subtitle&quot;&gt;{{ subtitle }}&lt;/p&gt;
+&lt;div class=&quot;badge&quot;&gt;{{ count }} rows rendered&lt;/div&gt;
+
+{% for i in range(1, count + 1) %}
+&lt;div class=&quot;item&quot; data-row=&quot;{{ i }}&quot;&gt;
+  &lt;span class=&quot;dot&quot;&gt;&lt;/span&gt;
+  &lt;span class=&quot;num&quot;&gt;{{ i }}&lt;/span&gt;
+  &lt;span&gt;Benchmark row {{ i }}&lt;/span&gt;
+&lt;/div&gt;
+{% endfor %}</code></pre>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="payload">
+  <div class="eyebrow">Payload</div>
+  <h2>The 32 KB JSON.</h2>
+  <p class="lede">The exact payload returned by <code>/json/nested</code> in every framework.</p>
+  <details>
+    <summary>Open the 32 KB JSON payload</summary>
+<pre data-lang="json"><code>{
+  &quot;platform&quot;: {
+    &quot;id&quot;: &quot;PLT-2026-001&quot;,
+    &quot;name&quot;: &quot;TechWorld Enterprise&quot;,
+    &quot;version&quot;: &quot;3.8.2&quot;,
+    &quot;environment&quot;: &quot;production&quot;,
+    &quot;company&quot;: {
+      &quot;name&quot;: &quot;TechWorld Global Ltd.&quot;,
+      &quot;registration_number&quot;: &quot;REG-987654321&quot;,
+      &quot;founded&quot;: 2018,
+      &quot;headquarters&quot;: {
+        &quot;address&quot;: &quot;123 Business Avenue&quot;,
+        &quot;city&quot;: &quot;New York&quot;,
+        &quot;state&quot;: &quot;NY&quot;,
+        &quot;country&quot;: &quot;USA&quot;,
+        &quot;coordinates&quot;: {
+          &quot;latitude&quot;: 40.7128,
+          &quot;longitude&quot;: -74.0060
+        }
+      },
+      &quot;branches&quot;: [
+        {
+          &quot;id&quot;: &quot;BR-001&quot;,
+          &quot;name&quot;: &quot;New York Branch&quot;,
+          &quot;manager_id&quot;: 501,
+          &quot;employees&quot;: 45,
+          &quot;contact&quot;: {
+            &quot;email&quot;: &quot;ny@techworld.example.com&quot;,
+            &quot;phone&quot;: &quot;+12125550101&quot;
+          }
+        },
+        {
+          &quot;id&quot;: &quot;BR-002&quot;,
+          &quot;name&quot;: &quot;London Branch&quot;,
+          &quot;manager_id&quot;: 502,
+          &quot;employees&quot;: 32,
+          &quot;contact&quot;: {
+            &quot;email&quot;: &quot;london@techworld.example.com&quot;,
+            &quot;phone&quot;: &quot;+442071234567&quot;
+          }
+        },
+        {
+          &quot;id&quot;: &quot;BR-003&quot;,
+          &quot;name&quot;: &quot;Singapore Branch&quot;,
+          &quot;manager_id&quot;: 503,
+          &quot;employees&quot;: 28,
+          &quot;contact&quot;: {
+            &quot;email&quot;: &quot;sg@techworld.example.com&quot;,
+            &quot;phone&quot;: &quot;+6561234567&quot;
+          }
+        }
+      ]
+    },
+    &quot;configuration&quot;: {
+      &quot;currency&quot;: &quot;USD&quot;,
+      &quot;timezone&quot;: &quot;UTC&quot;,
+      &quot;locale&quot;: &quot;en-US&quot;,
+      &quot;maintenance_mode&quot;: false,
+      &quot;features&quot;: {
+        &quot;inventory_tracking&quot;: true,
+        &quot;multi_currency&quot;: true,
+        &quot;automated_billing&quot;: true,
+        &quot;recommendation_engine&quot;: true,
+        &quot;fraud_detection&quot;: true,
+        &quot;multi_warehouse&quot;: true
+      },
+      &quot;security&quot;: {
+        &quot;two_factor_authentication&quot;: true,
+        &quot;session_timeout_minutes&quot;: 30,
+        &quot;max_login_attempts&quot;: 5,
+        &quot;password_policy&quot;: {
+          &quot;minimum_length&quot;: 12,
+          &quot;require_uppercase&quot;: true,
+          &quot;require_numbers&quot;: true,
+          &quot;require_special_characters&quot;: true
+        }
+      }
+    }
+  },
+  &quot;users&quot;: [
+    {
+      &quot;id&quot;: 101,
+      &quot;uuid&quot;: &quot;usr_8f7d9a21&quot;,
+      &quot;username&quot;: &quot;johndoe&quot;,
+      &quot;first_name&quot;: &quot;John&quot;,
+      &quot;last_name&quot;: &quot;Doe&quot;,
+      &quot;email&quot;: &quot;john@example.com&quot;,
+      &quot;role&quot;: &quot;customer&quot;,
+      &quot;status&quot;: &quot;active&quot;,
+      &quot;profile&quot;: {
+        &quot;avatar&quot;: &quot;https://example.com/avatars/101.jpg&quot;,
+        &quot;date_of_birth&quot;: &quot;1992-05-14&quot;,
+        &quot;gender&quot;: &quot;male&quot;,
+        &quot;phone&quot;: &quot;+1234567890&quot;,
+        &quot;addresses&quot;: [
+          {
+            &quot;id&quot;: &quot;ADDR-001&quot;,
+            &quot;type&quot;: &quot;home&quot;,
+            &quot;default&quot;: true,
+            &quot;street&quot;: &quot;123 Main Street&quot;,
+            &quot;city&quot;: &quot;New York&quot;,
+            &quot;state&quot;: &quot;NY&quot;,
+            &quot;postal_code&quot;: &quot;10001&quot;,
+            &quot;country&quot;: &quot;USA&quot;
+          },
+          {
+            &quot;id&quot;: &quot;ADDR-002&quot;,
+            &quot;type&quot;: &quot;office&quot;,
+            &quot;default&quot;: false,
+            &quot;street&quot;: &quot;45 Wall Street&quot;,
+            &quot;city&quot;: &quot;New York&quot;,
+            &quot;state&quot;: &quot;NY&quot;,
+            &quot;postal_code&quot;: &quot;10005&quot;,
+            &quot;country&quot;: &quot;USA&quot;
+          }
+        ]
+      },
+      &quot;preferences&quot;: {
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;currency&quot;: &quot;USD&quot;,
+        &quot;newsletter&quot;: true,
+        &quot;marketing_notifications&quot;: false,
+        &quot;interests&quot;: [
+          &quot;gaming&quot;,
+          &quot;computers&quot;,
+          &quot;smartphones&quot;,
+          &quot;accessories&quot;
+        ]
+      },
+      &quot;account&quot;: {
+        &quot;email_verified&quot;: true,
+        &quot;phone_verified&quot;: true,
+        &quot;last_login&quot;: &quot;2026-11-22T08:30:00Z&quot;,
+        &quot;login_count&quot;: 248,
+        &quot;loyalty_points&quot;: 1850,
+        &quot;membership&quot;: {
+          &quot;tier&quot;: &quot;gold&quot;,
+          &quot;joined_at&quot;: &quot;2023-04-12&quot;,
+          &quot;expires_at&quot;: &quot;2027-04-12&quot;,
+          &quot;benefits&quot;: [
+            &quot;free_shipping&quot;,
+            &quot;priority_support&quot;,
+            &quot;exclusive_discounts&quot;
+          ]
+        }
+      }
+    },
+    {
+      &quot;id&quot;: 102,
+      &quot;uuid&quot;: &quot;usr_7a3c9e52&quot;,
+      &quot;username&quot;: &quot;janesmith&quot;,
+      &quot;first_name&quot;: &quot;Jane&quot;,
+      &quot;last_name&quot;: &quot;Smith&quot;,
+      &quot;email&quot;: &quot;jane@example.com&quot;,
+      &quot;role&quot;: &quot;customer&quot;,
+      &quot;status&quot;: &quot;active&quot;,
+      &quot;profile&quot;: {
+        &quot;avatar&quot;: &quot;https://example.com/avatars/102.jpg&quot;,
+        &quot;date_of_birth&quot;: &quot;1989-11-23&quot;,
+        &quot;gender&quot;: &quot;female&quot;,
+        &quot;phone&quot;: &quot;+1987654321&quot;,
+        &quot;addresses&quot;: [
+          {
+            &quot;id&quot;: &quot;ADDR-003&quot;,
+            &quot;type&quot;: &quot;home&quot;,
+            &quot;default&quot;: true,
+            &quot;street&quot;: &quot;45 Park Avenue&quot;,
+            &quot;city&quot;: &quot;Chicago&quot;,
+            &quot;state&quot;: &quot;IL&quot;,
+            &quot;postal_code&quot;: &quot;60601&quot;,
+            &quot;country&quot;: &quot;USA&quot;
+          }
+        ]
+      },
+      &quot;preferences&quot;: {
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;currency&quot;: &quot;USD&quot;,
+        &quot;newsletter&quot;: false,
+        &quot;marketing_notifications&quot;: true,
+        &quot;interests&quot;: [&quot;photography&quot;, &quot;electronics&quot;, &quot;travel&quot;]
+      },
+      &quot;account&quot;: {
+        &quot;email_verified&quot;: true,
+        &quot;phone_verified&quot;: false,
+        &quot;last_login&quot;: &quot;2026-11-21T17:45:00Z&quot;,
+        &quot;login_count&quot;: 156,
+        &quot;loyalty_points&quot;: 920,
+        &quot;membership&quot;: {
+          &quot;tier&quot;: &quot;silver&quot;,
+          &quot;joined_at&quot;: &quot;2024-02-18&quot;,
+          &quot;expires_at&quot;: &quot;2027-02-18&quot;,
+          &quot;benefits&quot;: [&quot;discounts&quot;, &quot;standard_support&quot;]
+        }
+      }
+    }
+  ],
+  &quot;departments&quot;: [
+    {
+      &quot;id&quot;: &quot;DEP-001&quot;,
+      &quot;name&quot;: &quot;Engineering&quot;,
+      &quot;budget&quot;: 450000,
+      &quot;manager_id&quot;: 501,
+      &quot;teams&quot;: [
+        {
+          &quot;id&quot;: &quot;TEAM-001&quot;,
+          &quot;name&quot;: &quot;Backend Development&quot;,
+          &quot;lead_id&quot;: 510,
+          &quot;members&quot;: [511, 512, 513, 514],
+          &quot;technologies&quot;: [&quot;Python&quot;, &quot;PostgreSQL&quot;, &quot;Redis&quot;, &quot;RabbitMQ&quot;],
+          &quot;projects&quot;: [
+            {
+              &quot;id&quot;: &quot;PRJ-001&quot;,
+              &quot;name&quot;: &quot;Order Processing System&quot;,
+              &quot;status&quot;: &quot;in_progress&quot;,
+              &quot;completion_percentage&quot;: 75,
+              &quot;milestones&quot;: [
+                {
+                  &quot;name&quot;: &quot;Database Architecture&quot;,
+                  &quot;status&quot;: &quot;completed&quot;,
+                  &quot;completed_at&quot;: &quot;2026-09-10&quot;
+                },
+                {
+                  &quot;name&quot;: &quot;API Development&quot;,
+                  &quot;status&quot;: &quot;completed&quot;,
+                  &quot;completed_at&quot;: &quot;2026-10-05&quot;
+                },
+                {
+                  &quot;name&quot;: &quot;Performance Optimization&quot;,
+                  &quot;status&quot;: &quot;in_progress&quot;,
+                  &quot;due_date&quot;: &quot;2026-12-15&quot;
+                }
+              ]
+            }
+          ]
+        },
+        {
+          &quot;id&quot;: &quot;TEAM-002&quot;,
+          &quot;name&quot;: &quot;Frontend Development&quot;,
+          &quot;lead_id&quot;: 520,
+          &quot;members&quot;: [521, 522, 523],
+          &quot;technologies&quot;: [&quot;React&quot;, &quot;TypeScript&quot;, &quot;Next.js&quot;],
+          &quot;projects&quot;: [
+            {
+              &quot;id&quot;: &quot;PRJ-002&quot;,
+              &quot;name&quot;: &quot;Customer Dashboard&quot;,
+              &quot;status&quot;: &quot;active&quot;,
+              &quot;completion_percentage&quot;: 60,
+              &quot;milestones&quot;: [
+                {
+                  &quot;name&quot;: &quot;UI Design&quot;,
+                  &quot;status&quot;: &quot;completed&quot;
+                },
+                {
+                  &quot;name&quot;: &quot;Dashboard Integration&quot;,
+                  &quot;status&quot;: &quot;in_progress&quot;
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;DEP-002&quot;,
+      &quot;name&quot;: &quot;Operations&quot;,
+      &quot;budget&quot;: 280000,
+      &quot;manager_id&quot;: 502,
+      &quot;teams&quot;: [
+        {
+          &quot;id&quot;: &quot;TEAM-003&quot;,
+          &quot;name&quot;: &quot;Warehouse Operations&quot;,
+          &quot;lead_id&quot;: 530,
+          &quot;members&quot;: [531, 532, 533],
+          &quot;responsibilities&quot;: [
+            &quot;inventory_management&quot;,
+            &quot;stock_reconciliation&quot;,
+            &quot;shipment_processing&quot;
+          ]
+        }
+      ]
+    }
+  ],
+  &quot;categories&quot;: [
+    {
+      &quot;id&quot;: 1,
+      &quot;name&quot;: &quot;Electronics&quot;,
+      &quot;slug&quot;: &quot;electronics&quot;,
+      &quot;description&quot;: &quot;Electronic devices and accessories&quot;,
+      &quot;parent_id&quot;: null,
+      &quot;subcategories&quot;: [
+        {
+          &quot;id&quot;: 11,
+          &quot;name&quot;: &quot;Computers&quot;,
+          &quot;slug&quot;: &quot;computers&quot;,
+          &quot;parent_id&quot;: 1,
+          &quot;subcategories&quot;: [
+            {
+              &quot;id&quot;: 111,
+              &quot;name&quot;: &quot;Laptops&quot;,
+              &quot;parent_id&quot;: 11,
+              &quot;subcategories&quot;: []
+            },
+            {
+              &quot;id&quot;: 112,
+              &quot;name&quot;: &quot;Desktops&quot;,
+              &quot;parent_id&quot;: 11,
+              &quot;subcategories&quot;: []
+            },
+            {
+              &quot;id&quot;: 113,
+              &quot;name&quot;: &quot;Computer Components&quot;,
+              &quot;parent_id&quot;: 11,
+              &quot;subcategories&quot;: []
+            }
+          ]
+        },
+        {
+          &quot;id&quot;: 12,
+          &quot;name&quot;: &quot;Mobile Devices&quot;,
+          &quot;slug&quot;: &quot;mobile-devices&quot;,
+          &quot;parent_id&quot;: 1,
+          &quot;subcategories&quot;: [
+            {
+              &quot;id&quot;: 121,
+              &quot;name&quot;: &quot;Smartphones&quot;,
+              &quot;parent_id&quot;: 12,
+              &quot;subcategories&quot;: []
+            },
+            {
+              &quot;id&quot;: 122,
+              &quot;name&quot;: &quot;Tablets&quot;,
+              &quot;parent_id&quot;: 12,
+              &quot;subcategories&quot;: []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      &quot;id&quot;: 2,
+      &quot;name&quot;: &quot;Accessories&quot;,
+      &quot;slug&quot;: &quot;accessories&quot;,
+      &quot;description&quot;: &quot;Computer and mobile accessories&quot;,
+      &quot;parent_id&quot;: null,
+      &quot;subcategories&quot;: [
+        {
+          &quot;id&quot;: 21,
+          &quot;name&quot;: &quot;Peripherals&quot;,
+          &quot;parent_id&quot;: 2,
+          &quot;subcategories&quot;: []
+        },
+        {
+          &quot;id&quot;: 22,
+          &quot;name&quot;: &quot;Audio&quot;,
+          &quot;parent_id&quot;: 2,
+          &quot;subcategories&quot;: []
+        }
+      ]
+    }
+  ],
+  &quot;products&quot;: [
+    {
+      &quot;id&quot;: &quot;PRD-001&quot;,
+      &quot;sku&quot;: &quot;LAP-DELL-001&quot;,
+      &quot;name&quot;: &quot;Dell XPS 15&quot;,
+      &quot;description&quot;: &quot;High-performance professional laptop&quot;,
+      &quot;category_id&quot;: 111,
+      &quot;brand&quot;: {
+        &quot;id&quot;: &quot;BRAND-001&quot;,
+        &quot;name&quot;: &quot;Dell&quot;,
+        &quot;country&quot;: &quot;USA&quot;
+      },
+      &quot;pricing&quot;: {
+        &quot;cost&quot;: 950,
+        &quot;retail&quot;: 1299.99,
+        &quot;discount&quot;: {
+          &quot;percentage&quot;: 10,
+          &quot;valid_until&quot;: &quot;2026-12-31&quot;
+        },
+        &quot;tax_rate&quot;: 8.5,
+        &quot;currency&quot;: &quot;USD&quot;
+      },
+      &quot;specifications&quot;: {
+        &quot;processor&quot;: {
+          &quot;manufacturer&quot;: &quot;Intel&quot;,
+          &quot;model&quot;: &quot;Core i7-13700H&quot;,
+          &quot;cores&quot;: 14,
+          &quot;threads&quot;: 20,
+          &quot;base_clock&quot;: 2.4,
+          &quot;boost_clock&quot;: 5.0
+        },
+        &quot;memory&quot;: {
+          &quot;type&quot;: &quot;DDR5&quot;,
+          &quot;capacity_gb&quot;: 32,
+          &quot;speed_mhz&quot;: 5200
+        },
+        &quot;storage&quot;: [
+          {
+            &quot;type&quot;: &quot;NVMe SSD&quot;,
+            &quot;capacity_gb&quot;: 1024
+          }
+        ],
+        &quot;display&quot;: {
+          &quot;size_inches&quot;: 15.6,
+          &quot;resolution&quot;: &quot;3456x2160&quot;,
+          &quot;panel&quot;: &quot;OLED&quot;,
+          &quot;refresh_rate&quot;: 60,
+          &quot;touchscreen&quot;: true
+        },
+        &quot;connectivity&quot;: {
+          &quot;wifi&quot;: &quot;WiFi 6E&quot;,
+          &quot;bluetooth&quot;: &quot;5.3&quot;,
+          &quot;ports&quot;: [
+            &quot;Thunderbolt 4&quot;,
+            &quot;USB-C&quot;,
+            &quot;HDMI&quot;,
+            &quot;3.5mm Audio&quot;
+          ]
+        }
+      },
+      &quot;inventory&quot;: {
+        &quot;total_stock&quot;: 125,
+        &quot;reserved_stock&quot;: 15,
+        &quot;available_stock&quot;: 110,
+        &quot;reorder_level&quot;: 20,
+        &quot;warehouses&quot;: [
+          {
+            &quot;warehouse_id&quot;: &quot;WH-001&quot;,
+            &quot;quantity&quot;: 60,
+            &quot;bin&quot;: &quot;A-12-04&quot;
+          },
+          {
+            &quot;warehouse_id&quot;: &quot;WH-002&quot;,
+            &quot;quantity&quot;: 65,
+            &quot;bin&quot;: &quot;B-08-02&quot;
+          }
+        ]
+      },
+      &quot;media&quot;: {
+        &quot;thumbnail&quot;: &quot;https://example.com/products/dell-xps-thumb.jpg&quot;,
+        &quot;gallery&quot;: [
+          &quot;https://example.com/products/dell-xps-1.jpg&quot;,
+          &quot;https://example.com/products/dell-xps-2.jpg&quot;,
+          &quot;https://example.com/products/dell-xps-3.jpg&quot;
+        ],
+        &quot;videos&quot;: [
+          {
+            &quot;title&quot;: &quot;Product Overview&quot;,
+            &quot;url&quot;: &quot;https://example.com/videos/xps-overview.mp4&quot;,
+            &quot;duration_seconds&quot;: 120
+          }
+        ]
+      },
+      &quot;reviews&quot;: {
+        &quot;average_rating&quot;: 4.7,
+        &quot;total_reviews&quot;: 245,
+        &quot;rating_distribution&quot;: {
+          &quot;5&quot;: 180,
+          &quot;4&quot;: 40,
+          &quot;3&quot;: 15,
+          &quot;2&quot;: 7,
+          &quot;1&quot;: 3
+        }
+      },
+      &quot;tags&quot;: [&quot;laptop&quot;, &quot;professional&quot;, &quot;business&quot;, &quot;oled&quot;],
+      &quot;is_active&quot;: true,
+      &quot;created_at&quot;: &quot;2026-01-10T10:00:00Z&quot;
+    },
+    {
+      &quot;id&quot;: &quot;PRD-002&quot;,
+      &quot;sku&quot;: &quot;MOU-LOG-002&quot;,
+      &quot;name&quot;: &quot;Logitech MX Master 3S&quot;,
+      &quot;description&quot;: &quot;Wireless ergonomic productivity mouse&quot;,
+      &quot;category_id&quot;: 21,
+      &quot;brand&quot;: {
+        &quot;id&quot;: &quot;BRAND-002&quot;,
+        &quot;name&quot;: &quot;Logitech&quot;,
+        &quot;country&quot;: &quot;Switzerland&quot;
+      },
+      &quot;pricing&quot;: {
+        &quot;cost&quot;: 55,
+        &quot;retail&quot;: 99.99,
+        &quot;discount&quot;: {
+          &quot;percentage&quot;: 5,
+          &quot;valid_until&quot;: &quot;2026-12-31&quot;
+        },
+        &quot;tax_rate&quot;: 8.5,
+        &quot;currency&quot;: &quot;USD&quot;
+      },
+      &quot;specifications&quot;: {
+        &quot;sensor&quot;: {
+          &quot;type&quot;: &quot;Optical&quot;,
+          &quot;dpi&quot;: 8000
+        },
+        &quot;connectivity&quot;: [&quot;Bluetooth&quot;, &quot;USB Receiver&quot;],
+        &quot;battery&quot;: {
+          &quot;type&quot;: &quot;Rechargeable&quot;,
+          &quot;capacity_mah&quot;: 500,
+          &quot;life_hours&quot;: 70
+        },
+        &quot;buttons&quot;: {
+          &quot;total&quot;: 7,
+          &quot;programmable&quot;: 6
+        }
+      },
+      &quot;inventory&quot;: {
+        &quot;total_stock&quot;: 450,
+        &quot;reserved_stock&quot;: 32,
+        &quot;available_stock&quot;: 418,
+        &quot;reorder_level&quot;: 50,
+        &quot;warehouses&quot;: [
+          {
+            &quot;warehouse_id&quot;: &quot;WH-001&quot;,
+            &quot;quantity&quot;: 200,
+            &quot;bin&quot;: &quot;C-02-01&quot;
+          },
+          {
+            &quot;warehouse_id&quot;: &quot;WH-002&quot;,
+            &quot;quantity&quot;: 250,
+            &quot;bin&quot;: &quot;D-01-05&quot;
+          }
+        ]
+      },
+      &quot;media&quot;: {
+        &quot;thumbnail&quot;: &quot;https://example.com/products/mx-master-thumb.jpg&quot;,
+        &quot;gallery&quot;: [
+          &quot;https://example.com/products/mx-master-1.jpg&quot;,
+          &quot;https://example.com/products/mx-master-2.jpg&quot;
+        ],
+        &quot;videos&quot;: []
+      },
+      &quot;reviews&quot;: {
+        &quot;average_rating&quot;: 4.8,
+        &quot;total_reviews&quot;: 892,
+        &quot;rating_distribution&quot;: {
+          &quot;5&quot;: 700,
+          &quot;4&quot;: 140,
+          &quot;3&quot;: 30,
+          &quot;2&quot;: 12,
+          &quot;1&quot;: 10
+        }
+      },
+      &quot;tags&quot;: [&quot;mouse&quot;, &quot;wireless&quot;, &quot;ergonomic&quot;],
+      &quot;is_active&quot;: true,
+      &quot;created_at&quot;: &quot;2026-02-15T11:30:00Z&quot;
+    }
+  ],
+  &quot;suppliers&quot;: [
+    {
+      &quot;id&quot;: &quot;SUP-001&quot;,
+      &quot;name&quot;: &quot;Global Electronics Distribution&quot;,
+      &quot;status&quot;: &quot;active&quot;,
+      &quot;contact&quot;: {
+        &quot;person&quot;: &quot;Michael Brown&quot;,
+        &quot;email&quot;: &quot;sales@supplier.example.com&quot;,
+        &quot;phone&quot;: &quot;+12125550999&quot;
+      },
+      &quot;address&quot;: {
+        &quot;street&quot;: &quot;500 Industrial Road&quot;,
+        &quot;city&quot;: &quot;New Jersey&quot;,
+        &quot;country&quot;: &quot;USA&quot;
+      },
+      &quot;payment_terms&quot;: {
+        &quot;method&quot;: &quot;bank_transfer&quot;,
+        &quot;credit_days&quot;: 30,
+        &quot;currency&quot;: &quot;USD&quot;
+      },
+      &quot;supplied_products&quot;: [&quot;PRD-001&quot;, &quot;PRD-002&quot;],
+      &quot;performance&quot;: {
+        &quot;total_orders&quot;: 125,
+        &quot;on_time_delivery_rate&quot;: 96.5,
+        &quot;quality_score&quot;: 4.8,
+        &quot;average_lead_time_days&quot;: 7
+      }
+    },
+    {
+      &quot;id&quot;: &quot;SUP-002&quot;,
+      &quot;name&quot;: &quot;Asia Technology Wholesale&quot;,
+      &quot;status&quot;: &quot;active&quot;,
+      &quot;contact&quot;: {
+        &quot;person&quot;: &quot;David Chen&quot;,
+        &quot;email&quot;: &quot;orders@asiawholesale.example.com&quot;,
+        &quot;phone&quot;: &quot;+6561239876&quot;
+      },
+      &quot;address&quot;: {
+        &quot;street&quot;: &quot;88 Industrial Park&quot;,
+        &quot;city&quot;: &quot;Singapore&quot;,
+        &quot;country&quot;: &quot;Singapore&quot;
+      },
+      &quot;payment_terms&quot;: {
+        &quot;method&quot;: &quot;wire_transfer&quot;,
+        &quot;credit_days&quot;: 45,
+        &quot;currency&quot;: &quot;USD&quot;
+      },
+      &quot;supplied_products&quot;: [&quot;PRD-002&quot;],
+      &quot;performance&quot;: {
+        &quot;total_orders&quot;: 87,
+        &quot;on_time_delivery_rate&quot;: 92.1,
+        &quot;quality_score&quot;: 4.5,
+        &quot;average_lead_time_days&quot;: 12
+      }
+    }
+  ],
+  &quot;warehouses&quot;: [
+    {
+      &quot;id&quot;: &quot;WH-001&quot;,
+      &quot;name&quot;: &quot;New York Central Warehouse&quot;,
+      &quot;location&quot;: {
+        &quot;city&quot;: &quot;New York&quot;,
+        &quot;country&quot;: &quot;USA&quot;,
+        &quot;coordinates&quot;: {
+          &quot;latitude&quot;: 40.7306,
+          &quot;longitude&quot;: -73.9352
+        }
+      },
+      &quot;capacity&quot;: {
+        &quot;total_units&quot;: 50000,
+        &quot;occupied_units&quot;: 32500,
+        &quot;available_units&quot;: 17500,
+        &quot;utilization_percentage&quot;: 65
+      },
+      &quot;sections&quot;: [
+        {
+          &quot;id&quot;: &quot;SEC-A&quot;,
+          &quot;name&quot;: &quot;Electronics&quot;,
+          &quot;temperature_controlled&quot;: true,
+          &quot;bins&quot;: [
+            {
+              &quot;id&quot;: &quot;A-12-04&quot;,
+              &quot;capacity&quot;: 500,
+              &quot;occupied&quot;: 320,
+              &quot;products&quot;: [&quot;PRD-001&quot;]
+            },
+            {
+              &quot;id&quot;: &quot;A-12-05&quot;,
+              &quot;capacity&quot;: 300,
+              &quot;occupied&quot;: 180,
+              &quot;products&quot;: [&quot;PRD-001&quot;, &quot;PRD-002&quot;]
+            }
+          ]
+        },
+        {
+          &quot;id&quot;: &quot;SEC-B&quot;,
+          &quot;name&quot;: &quot;Accessories&quot;,
+          &quot;temperature_controlled&quot;: false,
+          &quot;bins&quot;: [
+            {
+              &quot;id&quot;: &quot;B-08-02&quot;,
+              &quot;capacity&quot;: 1000,
+              &quot;occupied&quot;: 650,
+              &quot;products&quot;: [&quot;PRD-002&quot;]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;WH-002&quot;,
+      &quot;name&quot;: &quot;London Distribution Center&quot;,
+      &quot;location&quot;: {
+        &quot;city&quot;: &quot;London&quot;,
+        &quot;country&quot;: &quot;UK&quot;
+      },
+      &quot;capacity&quot;: {
+        &quot;total_units&quot;: 30000,
+        &quot;occupied_units&quot;: 18000,
+        &quot;available_units&quot;: 12000,
+        &quot;utilization_percentage&quot;: 60
+      },
+      &quot;sections&quot;: [
+        {
+          &quot;id&quot;: &quot;SEC-C&quot;,
+          &quot;name&quot;: &quot;General Electronics&quot;,
+          &quot;temperature_controlled&quot;: false,
+          &quot;bins&quot;: [
+            {
+              &quot;id&quot;: &quot;C-02-01&quot;,
+              &quot;capacity&quot;: 800,
+              &quot;occupied&quot;: 400,
+              &quot;products&quot;: [&quot;PRD-002&quot;]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  &quot;orders&quot;: [
+    {
+      &quot;id&quot;: &quot;ORD-2026-1001&quot;,
+      &quot;reference&quot;: &quot;REF-982341&quot;,
+      &quot;user_id&quot;: 101,
+      &quot;status&quot;: &quot;processing&quot;,
+      &quot;channel&quot;: &quot;website&quot;,
+      &quot;items&quot;: [
+        {
+          &quot;product_id&quot;: &quot;PRD-001&quot;,
+          &quot;sku&quot;: &quot;LAP-DELL-001&quot;,
+          &quot;name&quot;: &quot;Dell XPS 15&quot;,
+          &quot;quantity&quot;: 1,
+          &quot;unit_price&quot;: 1299.99,
+          &quot;discount&quot;: 129.99,
+          &quot;subtotal&quot;: 1170
+        },
+        {
+          &quot;product_id&quot;: &quot;PRD-002&quot;,
+          &quot;sku&quot;: &quot;MOU-LOG-002&quot;,
+          &quot;name&quot;: &quot;Logitech MX Master 3S&quot;,
+          &quot;quantity&quot;: 2,
+          &quot;unit_price&quot;: 99.99,
+          &quot;discount&quot;: 10,
+          &quot;subtotal&quot;: 189.98
+        }
+      ],
+      &quot;pricing&quot;: {
+        &quot;subtotal&quot;: 1359.98,
+        &quot;discount&quot;: 139.99,
+        &quot;coupon&quot;: {
+          &quot;code&quot;: &quot;TECH2026&quot;,
+          &quot;discount_amount&quot;: 50
+        },
+        &quot;tax&quot;: 93.50,
+        &quot;shipping&quot;: 15,
+        &quot;grand_total&quot;: 1278.49,
+        &quot;currency&quot;: &quot;USD&quot;
+      },
+      &quot;payment&quot;: {
+        &quot;transaction_id&quot;: &quot;TXN-987654321&quot;,
+        &quot;method&quot;: &quot;credit_card&quot;,
+        &quot;provider&quot;: &quot;Stripe&quot;,
+        &quot;status&quot;: &quot;paid&quot;,
+        &quot;card&quot;: {
+          &quot;brand&quot;: &quot;Visa&quot;,
+          &quot;last_four&quot;: &quot;4242&quot;,
+          &quot;expiry_month&quot;: 12,
+          &quot;expiry_year&quot;: 2028
+        },
+        &quot;amount&quot;: 1278.49,
+        &quot;paid_at&quot;: &quot;2026-11-22T09:30:00Z&quot;
+      },
+      &quot;shipping&quot;: {
+        &quot;carrier&quot;: &quot;FedEx&quot;,
+        &quot;service&quot;: &quot;Express&quot;,
+        &quot;tracking_number&quot;: &quot;FX123456789&quot;,
+        &quot;status&quot;: &quot;preparing&quot;,
+        &quot;destination&quot;: {
+          &quot;name&quot;: &quot;John Doe&quot;,
+          &quot;street&quot;: &quot;123 Main Street&quot;,
+          &quot;city&quot;: &quot;New York&quot;,
+          &quot;state&quot;: &quot;NY&quot;,
+          &quot;postal_code&quot;: &quot;10001&quot;,
+          &quot;country&quot;: &quot;USA&quot;
+        },
+        &quot;estimated_delivery&quot;: &quot;2026-11-26&quot;,
+        &quot;history&quot;: [
+          {
+            &quot;status&quot;: &quot;order_received&quot;,
+            &quot;timestamp&quot;: &quot;2026-11-22T09:00:00Z&quot;
+          },
+          {
+            &quot;status&quot;: &quot;payment_confirmed&quot;,
+            &quot;timestamp&quot;: &quot;2026-11-22T09:30:00Z&quot;
+          },
+          {
+            &quot;status&quot;: &quot;preparing&quot;,
+            &quot;timestamp&quot;: &quot;2026-11-22T10:00:00Z&quot;
+          }
+        ]
+      },
+      &quot;notes&quot;: [
+        {
+          &quot;author&quot;: &quot;Customer&quot;,
+          &quot;message&quot;: &quot;Please deliver after 5 PM&quot;,
+          &quot;created_at&quot;: &quot;2026-11-22T08:55:00Z&quot;
+        }
+      ],
+      &quot;timestamps&quot;: {
+        &quot;created_at&quot;: &quot;2026-11-22T09:00:00Z&quot;,
+        &quot;updated_at&quot;: &quot;2026-11-22T10:00:00Z&quot;
+      }
+    },
+    {
+      &quot;id&quot;: &quot;ORD-2026-1002&quot;,
+      &quot;reference&quot;: &quot;REF-982342&quot;,
+      &quot;user_id&quot;: 102,
+      &quot;status&quot;: &quot;delivered&quot;,
+      &quot;channel&quot;: &quot;mobile_app&quot;,
+      &quot;items&quot;: [
+        {
+          &quot;product_id&quot;: &quot;PRD-002&quot;,
+          &quot;sku&quot;: &quot;MOU-LOG-002&quot;,
+          &quot;name&quot;: &quot;Logitech MX Master 3S&quot;,
+          &quot;quantity&quot;: 1,
+          &quot;unit_price&quot;: 99.99,
+          &quot;discount&quot;: 0,
+          &quot;subtotal&quot;: 99.99
+        }
+      ],
+      &quot;pricing&quot;: {
+        &quot;subtotal&quot;: 99.99,
+        &quot;discount&quot;: 0,
+        &quot;coupon&quot;: null,
+        &quot;tax&quot;: 8.50,
+        &quot;shipping&quot;: 0,
+        &quot;grand_total&quot;: 108.49,
+        &quot;currency&quot;: &quot;USD&quot;
+      },
+      &quot;payment&quot;: {
+        &quot;transaction_id&quot;: &quot;TXN-987654322&quot;,
+        &quot;method&quot;: &quot;paypal&quot;,
+        &quot;provider&quot;: &quot;PayPal&quot;,
+        &quot;status&quot;: &quot;paid&quot;,
+        &quot;amount&quot;: 108.49,
+        &quot;paid_at&quot;: &quot;2026-11-15T12:30:00Z&quot;
+      },
+      &quot;shipping&quot;: {
+        &quot;carrier&quot;: &quot;DHL&quot;,
+        &quot;tracking_number&quot;: &quot;DHL987654321&quot;,
+        &quot;status&quot;: &quot;delivered&quot;,
+        &quot;destination&quot;: {
+          &quot;name&quot;: &quot;Jane Smith&quot;,
+          &quot;city&quot;: &quot;Chicago&quot;,
+          &quot;state&quot;: &quot;IL&quot;,
+          &quot;country&quot;: &quot;USA&quot;
+        },
+        &quot;estimated_delivery&quot;: &quot;2026-11-18&quot;,
+        &quot;history&quot;: [
+          {
+            &quot;status&quot;: &quot;order_received&quot;,
+            &quot;timestamp&quot;: &quot;2026-11-15T12:00:00Z&quot;
+          },
+          {
+            &quot;status&quot;: &quot;shipped&quot;,
+            &quot;timestamp&quot;: &quot;2026-11-16T08:00:00Z&quot;
+          },
+          {
+            &quot;status&quot;: &quot;delivered&quot;,
+            &quot;timestamp&quot;: &quot;2026-11-18T14:30:00Z&quot;
+          }
+        ]
+      },
+      &quot;notes&quot;: [],
+      &quot;timestamps&quot;: {
+        &quot;created_at&quot;: &quot;2026-11-15T12:00:00Z&quot;,
+        &quot;updated_at&quot;: &quot;2026-11-18T14:30:00Z&quot;
+      }
+    }
+  ],
+  &quot;transactions&quot;: [
+    {
+      &quot;id&quot;: &quot;TXN-001&quot;,
+      &quot;order_id&quot;: &quot;ORD-2026-1001&quot;,
+      &quot;type&quot;: &quot;payment&quot;,
+      &quot;amount&quot;: 1278.49,
+      &quot;currency&quot;: &quot;USD&quot;,
+      &quot;status&quot;: &quot;completed&quot;,
+      &quot;gateway_response&quot;: {
+        &quot;code&quot;: &quot;00&quot;,
+        &quot;message&quot;: &quot;Approved&quot;,
+        &quot;authorization_code&quot;: &quot;AUTH-998877&quot;,
+        &quot;risk_assessment&quot;: {
+          &quot;score&quot;: 12,
+          &quot;level&quot;: &quot;low&quot;,
+          &quot;flags&quot;: []
+        }
+      },
+      &quot;created_at&quot;: &quot;2026-11-22T09:30:00Z&quot;
+    },
+    {
+      &quot;id&quot;: &quot;TXN-002&quot;,
+      &quot;order_id&quot;: &quot;ORD-2026-1002&quot;,
+      &quot;type&quot;: &quot;payment&quot;,
+      &quot;amount&quot;: 108.49,
+      &quot;currency&quot;: &quot;USD&quot;,
+      &quot;status&quot;: &quot;completed&quot;,
+      &quot;gateway_response&quot;: {
+        &quot;code&quot;: &quot;00&quot;,
+        &quot;message&quot;: &quot;Approved&quot;,
+        &quot;authorization_code&quot;: &quot;AUTH-998878&quot;,
+        &quot;risk_assessment&quot;: {
+          &quot;score&quot;: 8,
+          &quot;level&quot;: &quot;low&quot;,
+          &quot;flags&quot;: []
+        }
+      },
+      &quot;created_at&quot;: &quot;2026-11-15T12:30:00Z&quot;
+    }
+  ],
+  &quot;discount_campaigns&quot;: [
+    {
+      &quot;id&quot;: &quot;CMP-001&quot;,
+      &quot;name&quot;: &quot;Black Friday 2026&quot;,
+      &quot;code&quot;: &quot;BLACKFRIDAY&quot;,
+      &quot;type&quot;: &quot;percentage&quot;,
+      &quot;value&quot;: 20,
+      &quot;conditions&quot;: {
+        &quot;minimum_order_value&quot;: 100,
+        &quot;maximum_discount&quot;: 500,
+        &quot;eligible_categories&quot;: [1, 2],
+        &quot;eligible_memberships&quot;: [&quot;silver&quot;, &quot;gold&quot;, &quot;platinum&quot;]
+      },
+      &quot;usage&quot;: {
+        &quot;maximum_uses&quot;: 10000,
+        &quot;total_uses&quot;: 3250,
+        &quot;per_user_limit&quot;: 2
+      },
+      &quot;validity&quot;: {
+        &quot;starts_at&quot;: &quot;2026-11-20T00:00:00Z&quot;,
+        &quot;ends_at&quot;: &quot;2026-11-30T23:59:59Z&quot;
+      },
+      &quot;active&quot;: true
+    }
+  ],
+  &quot;support&quot;: {
+    &quot;tickets&quot;: [
+      {
+        &quot;id&quot;: &quot;TKT-001&quot;,
+        &quot;user_id&quot;: 101,
+        &quot;subject&quot;: &quot;Order delivery inquiry&quot;,
+        &quot;status&quot;: &quot;open&quot;,
+        &quot;priority&quot;: &quot;medium&quot;,
+        &quot;assigned_to&quot;: 601,
+        &quot;messages&quot;: [
+          {
+            &quot;id&quot;: &quot;MSG-001&quot;,
+            &quot;sender&quot;: &quot;customer&quot;,
+            &quot;message&quot;: &quot;When will my order arrive?&quot;,
+            &quot;attachments&quot;: [],
+            &quot;timestamp&quot;: &quot;2026-11-22T11:00:00Z&quot;
+          },
+          {
+            &quot;id&quot;: &quot;MSG-002&quot;,
+            &quot;sender&quot;: &quot;agent&quot;,
+            &quot;message&quot;: &quot;Your order is being prepared for shipment.&quot;,
+            &quot;attachments&quot;: [],
+            &quot;timestamp&quot;: &quot;2026-11-22T11:15:00Z&quot;
+          }
+        ],
+        &quot;resolution&quot;: null,
+        &quot;created_at&quot;: &quot;2026-11-22T11:00:00Z&quot;
+      },
+      {
+        &quot;id&quot;: &quot;TKT-002&quot;,
+        &quot;user_id&quot;: 102,
+        &quot;subject&quot;: &quot;Product return request&quot;,
+        &quot;status&quot;: &quot;resolved&quot;,
+        &quot;priority&quot;: &quot;high&quot;,
+        &quot;assigned_to&quot;: 602,
+        &quot;messages&quot;: [
+          {
+            &quot;id&quot;: &quot;MSG-003&quot;,
+            &quot;sender&quot;: &quot;customer&quot;,
+            &quot;message&quot;: &quot;I want to return my product.&quot;,
+            &quot;attachments&quot;: [
+              {
+                &quot;filename&quot;: &quot;product_photo.jpg&quot;,
+                &quot;url&quot;: &quot;https://example.com/uploads/product_photo.jpg&quot;,
+                &quot;size_bytes&quot;: 245000
+              }
+            ],
+            &quot;timestamp&quot;: &quot;2026-11-19T09:00:00Z&quot;
+          },
+          {
+            &quot;id&quot;: &quot;MSG-004&quot;,
+            &quot;sender&quot;: &quot;agent&quot;,
+            &quot;message&quot;: &quot;Your return request has been approved.&quot;,
+            &quot;attachments&quot;: [],
+            &quot;timestamp&quot;: &quot;2026-11-19T10:00:00Z&quot;
+          }
+        ],
+        &quot;resolution&quot;: {
+          &quot;type&quot;: &quot;return_approved&quot;,
+          &quot;refund_amount&quot;: 108.49,
+          &quot;resolved_at&quot;: &quot;2026-11-19T10:30:00Z&quot;
+        },
+        &quot;created_at&quot;: &quot;2026-11-19T09:00:00Z&quot;
+      }
+    ],
+    &quot;departments&quot;: [
+      {
+        &quot;id&quot;: &quot;SUPPORT-01&quot;,
+        &quot;name&quot;: &quot;Technical Support&quot;,
+        &quot;agents&quot;: [601, 603, 604],
+        &quot;working_hours&quot;: {
+          &quot;timezone&quot;: &quot;America/New_York&quot;,
+          &quot;weekdays&quot;: {
+            &quot;start&quot;: &quot;09:00&quot;,
+            &quot;end&quot;: &quot;18:00&quot;
+          }
+        }
+      },
+      {
+        &quot;id&quot;: &quot;SUPPORT-02&quot;,
+        &quot;name&quot;: &quot;Billing Support&quot;,
+        &quot;agents&quot;: [602, 605],
+        &quot;working_hours&quot;: {
+          &quot;timezone&quot;: &quot;America/New_York&quot;,
+          &quot;weekdays&quot;: {
+            &quot;start&quot;: &quot;08:00&quot;,
+            &quot;end&quot;: &quot;17:00&quot;
+          }
+        }
+      }
+    ]
+  },
+  &quot;notifications&quot;: [
+    {
+      &quot;id&quot;: &quot;NOT-001&quot;,
+      &quot;user_id&quot;: 101,
+      &quot;type&quot;: &quot;order_update&quot;,
+      &quot;title&quot;: &quot;Order confirmed&quot;,
+      &quot;body&quot;: &quot;Your order ORD-2026-1001 has been confirmed.&quot;,
+      &quot;data&quot;: {
+        &quot;order_id&quot;: &quot;ORD-2026-1001&quot;,
+        &quot;status&quot;: &quot;processing&quot;,
+        &quot;action&quot;: {
+          &quot;type&quot;: &quot;navigate&quot;,
+          &quot;screen&quot;: &quot;order_details&quot;,
+          &quot;parameters&quot;: {
+            &quot;order_id&quot;: &quot;ORD-2026-1001&quot;,
+            &quot;tab&quot;: &quot;tracking&quot;
+          }
+        }
+      },
+      &quot;delivery&quot;: {
+        &quot;email&quot;: {
+          &quot;sent&quot;: true,
+          &quot;sent_at&quot;: &quot;2026-11-22T09:31:00Z&quot;
+        },
+        &quot;push&quot;: {
+          &quot;sent&quot;: true,
+          &quot;sent_at&quot;: &quot;2026-11-22T09:31:05Z&quot;
+        },
+        &quot;sms&quot;: {
+          &quot;sent&quot;: false,
+          &quot;reason&quot;: &quot;user_disabled_sms&quot;
+        }
+      },
+      &quot;read&quot;: false,
+      &quot;created_at&quot;: &quot;2026-11-22T09:31:00Z&quot;
+    }
+  ],
+  &quot;analytics&quot;: {
+    &quot;overview&quot;: {
+      &quot;total_users&quot;: 125000,
+      &quot;active_users&quot;: 87500,
+      &quot;total_products&quot;: 18500,
+      &quot;total_orders&quot;: 245000,
+      &quot;total_revenue&quot;: 18500000.75,
+      &quot;average_order_value&quot;: 75.51,
+      &quot;conversion_rate&quot;: 3.85
+    },
+    &quot;sales&quot;: {
+      &quot;daily&quot;: [
+        {
+          &quot;date&quot;: &quot;2026-11-20&quot;,
+          &quot;orders&quot;: 1250,
+          &quot;revenue&quot;: 94500.50,
+          &quot;refunds&quot;: 1250
+        },
+        {
+          &quot;date&quot;: &quot;2026-11-21&quot;,
+          &quot;orders&quot;: 1480,
+          &quot;revenue&quot;: 112500.75,
+          &quot;refunds&quot;: 2450
+        },
+        {
+          &quot;date&quot;: &quot;2026-11-22&quot;,
+          &quot;orders&quot;: 980,
+          &quot;revenue&quot;: 78200.25,
+          &quot;refunds&quot;: 850
+        }
+      ],
+      &quot;monthly&quot;: [
+        {
+          &quot;month&quot;: &quot;2026-09&quot;,
+          &quot;orders&quot;: 28500,
+          &quot;revenue&quot;: 2100000
+        },
+        {
+          &quot;month&quot;: &quot;2026-10&quot;,
+          &quot;orders&quot;: 31200,
+          &quot;revenue&quot;: 2350000
+        },
+        {
+          &quot;month&quot;: &quot;2026-11&quot;,
+          &quot;orders&quot;: 35800,
+          &quot;revenue&quot;: 2850000
+        }
+      ]
+    },
+    &quot;customers&quot;: {
+      &quot;new_customers&quot;: 12500,
+      &quot;returning_customers&quot;: 65000,
+      &quot;retention_rate&quot;: 72.5,
+      &quot;top_customers&quot;: [
+        {
+          &quot;user_id&quot;: 101,
+          &quot;total_spent&quot;: 12500.50,
+          &quot;orders&quot;: 48
+        },
+        {
+          &quot;user_id&quot;: 102,
+          &quot;total_spent&quot;: 8700.25,
+          &quot;orders&quot;: 32
+        }
+      ]
+    },
+    &quot;inventory&quot;: {
+      &quot;total_skus&quot;: 18500,
+      &quot;low_stock_products&quot;: 125,
+      &quot;out_of_stock_products&quot;: 18,
+      &quot;inventory_value&quot;: 8500000,
+      &quot;warehouse_utilization&quot;: {
+        &quot;WH-001&quot;: 65,
+        &quot;WH-002&quot;: 60
+      }
+    },
+    &quot;traffic&quot;: {
+      &quot;total_visits&quot;: 2500000,
+      &quot;unique_visitors&quot;: 1850000,
+      &quot;sessions&quot;: 2200000,
+      &quot;bounce_rate&quot;: 32.5,
+      &quot;devices&quot;: {
+        &quot;desktop&quot;: 45,
+        &quot;mobile&quot;: 48,
+        &quot;tablet&quot;: 7
+      },
+      &quot;sources&quot;: [
+        {
+          &quot;name&quot;: &quot;organic_search&quot;,
+          &quot;visits&quot;: 950000,
+          &quot;percentage&quot;: 38
+        },
+        {
+          &quot;name&quot;: &quot;direct&quot;,
+          &quot;visits&quot;: 750000,
+          &quot;percentage&quot;: 30
+        },
+        {
+          &quot;name&quot;: &quot;social_media&quot;,
+          &quot;visits&quot;: 500000,
+          &quot;percentage&quot;: 20
+        },
+        {
+          &quot;name&quot;: &quot;referral&quot;,
+          &quot;visits&quot;: 300000,
+          &quot;percentage&quot;: 12
+        }
+      ]
+    }
+  },
+  &quot;system&quot;: {
+    &quot;services&quot;: [
+      {
+        &quot;name&quot;: &quot;api&quot;,
+        &quot;status&quot;: &quot;healthy&quot;,
+        &quot;instances&quot;: 4,
+        &quot;metrics&quot;: {
+          &quot;requests_per_second&quot;: 2500,
+          &quot;average_latency_ms&quot;: 24.5,
+          &quot;error_rate&quot;: 0.02,
+          &quot;cpu_usage&quot;: 45.2,
+          &quot;memory_usage_mb&quot;: 2048
+        }
+      },
+      {
+        &quot;name&quot;: &quot;worker&quot;,
+        &quot;status&quot;: &quot;healthy&quot;,
+        &quot;instances&quot;: 8,
+        &quot;metrics&quot;: {
+          &quot;jobs_processed&quot;: 125000,
+          &quot;jobs_pending&quot;: 350,
+          &quot;average_processing_ms&quot;: 120,
+          &quot;failed_jobs&quot;: 25,
+          &quot;cpu_usage&quot;: 35.8,
+          &quot;memory_usage_mb&quot;: 4096
+        }
+      },
+      {
+        &quot;name&quot;: &quot;database&quot;,
+        &quot;status&quot;: &quot;healthy&quot;,
+        &quot;engine&quot;: &quot;PostgreSQL&quot;,
+        &quot;version&quot;: &quot;18&quot;,
+        &quot;metrics&quot;: {
+          &quot;connections_active&quot;: 45,
+          &quot;connections_idle&quot;: 30,
+          &quot;max_connections&quot;: 200,
+          &quot;queries_per_second&quot;: 8500,
+          &quot;cache_hit_ratio&quot;: 98.7,
+          &quot;storage_used_gb&quot;: 1250
+        }
+      },
+      {
+        &quot;name&quot;: &quot;cache&quot;,
+        &quot;status&quot;: &quot;healthy&quot;,
+        &quot;engine&quot;: &quot;Redis&quot;,
+        &quot;version&quot;: &quot;8&quot;,
+        &quot;metrics&quot;: {
+          &quot;connected_clients&quot;: 850,
+          &quot;used_memory_mb&quot;: 4096,
+          &quot;total_keys&quot;: 1250000,
+          &quot;hit_rate&quot;: 96.8,
+          &quot;operations_per_second&quot;: 45000
+        }
+      }
+    ],
+    &quot;backups&quot;: [
+      {
+        &quot;id&quot;: &quot;BKP-001&quot;,
+        &quot;type&quot;: &quot;full&quot;,
+        &quot;database&quot;: &quot;production&quot;,
+        &quot;size_gb&quot;: 125,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;storage&quot;: {
+          &quot;provider&quot;: &quot;S3&quot;,
+          &quot;bucket&quot;: &quot;techworld-backups&quot;,
+          &quot;region&quot;: &quot;us-east-1&quot;,
+          &quot;path&quot;: &quot;/production/2026/11/22/&quot;
+        },
+        &quot;created_at&quot;: &quot;2026-11-22T02:00:00Z&quot;,
+        &quot;expires_at&quot;: &quot;2026-12-22T02:00:00Z&quot;
+      },
+      {
+        &quot;id&quot;: &quot;BKP-002&quot;,
+        &quot;type&quot;: &quot;incremental&quot;,
+        &quot;database&quot;: &quot;production&quot;,
+        &quot;size_gb&quot;: 12,
+        &quot;status&quot;: &quot;completed&quot;,
+        &quot;storage&quot;: {
+          &quot;provider&quot;: &quot;S3&quot;,
+          &quot;bucket&quot;: &quot;techworld-backups&quot;,
+          &quot;region&quot;: &quot;us-east-1&quot;,
+          &quot;path&quot;: &quot;/production/2026/11/22/&quot;
+        },
+        &quot;created_at&quot;: &quot;2026-11-22T12:00:00Z&quot;,
+        &quot;expires_at&quot;: &quot;2026-11-29T12:00:00Z&quot;
+      }
+    ],
+    &quot;audit_logs&quot;: [
+      {
+        &quot;id&quot;: &quot;AUD-001&quot;,
+        &quot;actor&quot;: {
+          &quot;user_id&quot;: 501,
+          &quot;username&quot;: &quot;admin_jane&quot;,
+          &quot;role&quot;: &quot;administrator&quot;
+        },
+        &quot;action&quot;: &quot;product_updated&quot;,
+        &quot;resource&quot;: {
+          &quot;type&quot;: &quot;product&quot;,
+          &quot;id&quot;: &quot;PRD-001&quot;,
+          &quot;changes&quot;: {
+            &quot;price&quot;: {
+              &quot;old&quot;: 1349.99,
+              &quot;new&quot;: 1299.99
+            },
+            &quot;stock&quot;: {
+              &quot;old&quot;: 120,
+              &quot;new&quot;: 125
+            }
+          }
+        },
+        &quot;request&quot;: {
+          &quot;ip_address&quot;: &quot;192.168.1.100&quot;,
+          &quot;user_agent&quot;: &quot;Chrome/157.0&quot;,
+          &quot;method&quot;: &quot;PATCH&quot;,
+          &quot;path&quot;: &quot;/api/v1/products/PRD-001&quot;
+        },
+        &quot;timestamp&quot;: &quot;2026-11-22T10:15:00Z&quot;
+      }
+    ]
+  },
+  &quot;integrations&quot;: {
+    &quot;payment_gateways&quot;: [
+      {
+        &quot;name&quot;: &quot;Stripe&quot;,
+        &quot;enabled&quot;: true,
+        &quot;configuration&quot;: {
+          &quot;mode&quot;: &quot;live&quot;,
+          &quot;webhook_enabled&quot;: true,
+          &quot;supported_currencies&quot;: [&quot;USD&quot;, &quot;EUR&quot;, &quot;GBP&quot;]
+        }
+      },
+      {
+        &quot;name&quot;: &quot;PayPal&quot;,
+        &quot;enabled&quot;: true,
+        &quot;configuration&quot;: {
+          &quot;mode&quot;: &quot;live&quot;,
+          &quot;webhook_enabled&quot;: true,
+          &quot;supported_currencies&quot;: [&quot;USD&quot;, &quot;EUR&quot;]
+        }
+      }
+    ],
+    &quot;shipping_providers&quot;: [
+      {
+        &quot;name&quot;: &quot;FedEx&quot;,
+        &quot;enabled&quot;: true,
+        &quot;services&quot;: [&quot;Express&quot;, &quot;Ground&quot;, &quot;International&quot;]
+      },
+      {
+        &quot;name&quot;: &quot;DHL&quot;,
+        &quot;enabled&quot;: true,
+        &quot;services&quot;: [&quot;Express Worldwide&quot;, &quot;Economy Select&quot;]
+      }
+    ],
+    &quot;external_apis&quot;: [
+      {
+        &quot;name&quot;: &quot;Currency Exchange API&quot;,
+        &quot;base_url&quot;: &quot;https://api.example.com/exchange&quot;,
+        &quot;authentication&quot;: {
+          &quot;type&quot;: &quot;bearer&quot;,
+          &quot;token_reference&quot;: &quot;CURRENCY_API_KEY&quot;
+        },
+        &quot;rate_limits&quot;: {
+          &quot;requests_per_minute&quot;: 1000,
+          &quot;requests_per_day&quot;: 100000
+        },
+        &quot;status&quot;: &quot;active&quot;
+      },
+      {
+        &quot;name&quot;: &quot;Geolocation API&quot;,
+        &quot;base_url&quot;: &quot;https://geo.example.com&quot;,
+        &quot;authentication&quot;: {
+          &quot;type&quot;: &quot;api_key&quot;,
+          &quot;token_reference&quot;: &quot;GEO_API_KEY&quot;
+        },
+        &quot;rate_limits&quot;: {
+          &quot;requests_per_minute&quot;: 500
+        },
+        &quot;status&quot;: &quot;active&quot;
+      }
+    ]
+  },
+  &quot;metadata&quot;: {
+    &quot;schema_version&quot;: &quot;2.5.0&quot;,
+    &quot;generated_at&quot;: &quot;2026-11-22T12:00:00Z&quot;,
+    &quot;data_source&quot;: &quot;production&quot;,
+    &quot;record_count&quot;: {
+      &quot;users&quot;: 125000,
+      &quot;products&quot;: 18500,
+      &quot;orders&quot;: 245000,
+      &quot;suppliers&quot;: 350,
+      &quot;warehouses&quot;: 12
+    },
+    &quot;pagination&quot;: {
+      &quot;page&quot;: 1,
+      &quot;per_page&quot;: 100,
+      &quot;total_pages&quot;: 1250,
+      &quot;has_next&quot;: true,
+      &quot;has_previous&quot;: false
+    }
+  }
+}</code></pre>
+  </details>
+</section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <span><span class="footer-brand">Flameo</span> · Fast, Flexible, Less Verbose Framework</span>
+    <span>Python 3.10+ · ASGI + RSGI · MIT License</span>
+  </div>
+</footer>
+
+<script>
+
+const TOKEN = /(?<com>#[^\n]*)|(?<str>"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(?<dec>@[A-Za-z_]\w*)|(?<kw>\b(?:async|await|def|class|return|if|else|try|except|with|as|from|import|for|in|not|and|or|is|None|True|False)\b)|(?<num>\b\d+(?:\.\d+)?\b)|(?<fn>\b(?:print|str|int|dict|list|len)\b)/g;
+function esc(text) {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+document.querySelectorAll("pre code").forEach(function (el) {
+  const src = el.textContent;
+  const re = new RegExp(TOKEN.source, "g");
+  let out = "";
+  let last = 0;
+  let match;
+  while ((match = re.exec(src)) !== null) {
+    out += esc(src.slice(last, match.index));
+    const groups = match.groups || {};
+    const kind = Object.keys(groups).find(function (key) { return groups[key] !== undefined; });
+    out += '<span class="' + kind + '">' + esc(match[0]) + "</span>";
+    last = match.index + match[0].length;
+  }
+  el.innerHTML = out + esc(src.slice(last));
+});
+
+document.querySelectorAll("pre").forEach(function (pre) {
+  if (pre.closest(".code-panel")) return;
+  const wrap = document.createElement("div");
+  wrap.className = "code-block";
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+  const btn = document.createElement("button");
+  btn.className = "copy-btn code-copy";
+  btn.type = "button";
+  btn.textContent = "Copy";
+  wrap.appendChild(btn);
+});
+
+document.querySelectorAll(".tab").forEach(function (tab) {
+  tab.addEventListener("click", function () {
+    document.querySelectorAll(".tab").forEach(function (item) {
+      item.classList.toggle("on", item === tab);
+    });
+    ["t-db", "t-cache", "t-state"].forEach(function (id) {
+      document.getElementById(id).hidden = id !== tab.dataset.t;
+    });
+  });
+});
+
+document.querySelectorAll(".copy-btn").forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    const container = btn.closest(".code-panel, .code-block");
+    let text = btn.dataset.copy;
+    if (!text && container) {
+      const active = container.querySelector(".tab.on");
+      const pre = active ? document.getElementById(active.dataset.t) : container.querySelector("pre");
+      text = pre ? pre.textContent : "";
+    }
+    navigator.clipboard.writeText(text || "").then(function () {
+      const label = btn.textContent;
+      btn.textContent = "Copied";
+      setTimeout(function () { btn.textContent = label; }, 1400);
+    });
+  });
+});
+
+const links = Array.from(document.querySelectorAll(".nav-links a"));
+const sections = Array.from(document.querySelectorAll("section[id], header[id]"));
+const observer = new IntersectionObserver(function (entries) {
+  entries.forEach(function (entry) {
+    if (!entry.isIntersecting) return;
+    links.forEach(function (link) {
+      link.classList.toggle("active", link.getAttribute("href") === "#" + entry.target.id);
+    });
+  });
+}, { rootMargin: "-45% 0px -50% 0px" });
+sections.forEach(function (section) { observer.observe(section); });
+
+</script>
+
+</body>
+</html>

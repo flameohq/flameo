@@ -1,0 +1,151 @@
+name: Tests
+
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+      - "**.txt"
+      - "**.svg"
+      - "LICENSE"
+      - ".gitignore"
+      - "docs/**"
+      - "test_files/**"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+      - "**.txt"
+      - "**.svg"
+      - "LICENSE"
+      - ".gitignore"
+      - "docs/**"
+      - "test_files/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e ".[test]"
+      - run: python -m pytest tests/ --cov=flameo --cov-branch --cov-report=term-missing --cov-report=xml:tests/coverage.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-python-${{ matrix.python-version }}
+          path: tests/coverage.xml
+
+  database-integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: flameo_test
+          POSTGRES_PASSWORD: flameo_test_password
+          POSTGRES_DB: flameo_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U flameo_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: flameo_test_password
+          MYSQL_DATABASE: flameo_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 20
+      oracle:
+        image: gvenzl/oracle-free:slim
+        env:
+          ORACLE_PASSWORD: flameo_test_password
+        ports:
+          - 1521:1521
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e ".[test]" asyncpg "asyncmy>=0.2" cryptography oracledb "pymongo>=4.17"
+      - name: Start MongoDB replica set
+        run: |
+          docker run -d --name flameo-mongo -p 27017:27017 mongo:7 --replSet rs0 --bind_ip_all
+          for attempt in $(seq 1 30); do
+            if docker exec flameo-mongo mongosh --quiet --eval 'db.runCommand({ping:1}).ok' | grep -q 1; then
+              break
+            fi
+            sleep 1
+          done
+          docker exec flameo-mongo mongosh --quiet --eval \
+            'rs.initiate({_id:"rs0",members:[{_id:0,host:"127.0.0.1:27017"}]})'
+      - name: Wait for Oracle to accept connections
+        env:
+          FLAMEO_TEST_ORACLE_HOST: 127.0.0.1
+          FLAMEO_TEST_ORACLE_PORT: "1521"
+          FLAMEO_TEST_ORACLE_USER: system
+          FLAMEO_TEST_ORACLE_PASSWORD: flameo_test_password
+          FLAMEO_TEST_ORACLE_DATABASE: FREEPDB1
+        run: |
+          python - <<'PY'
+          import os, time, oracledb
+          dsn = oracledb.makedsn(
+              os.environ["FLAMEO_TEST_ORACLE_HOST"],
+              os.environ["FLAMEO_TEST_ORACLE_PORT"],
+              service_name=os.environ["FLAMEO_TEST_ORACLE_DATABASE"],
+          )
+          for attempt in range(60):
+              try:
+                  conn = oracledb.connect(
+                      user=os.environ["FLAMEO_TEST_ORACLE_USER"],
+                      password=os.environ["FLAMEO_TEST_ORACLE_PASSWORD"],
+                      dsn=dsn,
+                  )
+                  conn.close()
+                  print("Oracle is ready")
+                  break
+              except Exception as exc:
+                  print(f"waiting for Oracle ({attempt + 1}/60): {exc}")
+                  time.sleep(5)
+          else:
+              raise SystemExit("Oracle did not become ready within 5 minutes")
+          PY
+      - env:
+          FLAMEO_TEST_POSTGRESQL_HOST: 127.0.0.1
+          FLAMEO_TEST_POSTGRESQL_PORT: "5432"
+          FLAMEO_TEST_POSTGRESQL_USER: flameo_test
+          FLAMEO_TEST_POSTGRESQL_PASSWORD: flameo_test_password
+          FLAMEO_TEST_POSTGRESQL_DATABASE: flameo_test
+          FLAMEO_TEST_MYSQL_HOST: 127.0.0.1
+          FLAMEO_TEST_MYSQL_PORT: "3306"
+          FLAMEO_TEST_MYSQL_USER: root
+          FLAMEO_TEST_MYSQL_PASSWORD: flameo_test_password
+          FLAMEO_TEST_MYSQL_DATABASE: flameo_test
+          FLAMEO_TEST_ORACLE_HOST: 127.0.0.1
+          FLAMEO_TEST_ORACLE_PORT: "1521"
+          FLAMEO_TEST_ORACLE_USER: system
+          FLAMEO_TEST_ORACLE_PASSWORD: flameo_test_password
+          FLAMEO_TEST_ORACLE_DATABASE: FREEPDB1
+          FLAMEO_TEST_MONGODB_URI: mongodb://127.0.0.1:27017/?replicaSet=rs0
+          FLAMEO_TEST_MONGODB_DB: flameo_test
+        run: python -m pytest tests/integration/test_database_services.py tests/integration/test_mongo_services.py -m integration -v
