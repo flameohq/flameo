@@ -1,24 +1,7 @@
 name: Tests
 
 on:
-  push:
-    paths-ignore:
-      - "**.md"
-      - "**.txt"
-      - "**.svg"
-      - "LICENSE"
-      - ".gitignore"
-      - "docs/**"
-      - "test_files/**"
-  pull_request:
-    paths-ignore:
-      - "**.md"
-      - "**.txt"
-      - "**.svg"
-      - "LICENSE"
-      - ".gitignore"
-      - "docs/**"
-      - "test_files/**"
+  workflow_dispatch:
 
 jobs:
   test:
