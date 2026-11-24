@@ -1,0 +1,98 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flameo"
+version = "0.1.1"
+description = "An asynchronous Python web framework with ASGI and RSGI support"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+  { name = "Mozammel Hoque", email = "mozammelshbl@gmail.com" },
+]
+maintainers = [
+  { name = "Mozammel Hoque", email = "mozammelshbl@gmail.com" },
+]
+keywords = [
+  "web framework",
+  "asgi",
+  "rsgi",
+  "async",
+  "granian",
+  "uvloop",
+  "http server",
+]
+requires-python = ">=3.10"
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Framework :: AsyncIO",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
+  "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+]
+dependencies = [
+  "aiofiles>=23",
+  "granian>=2",
+  "orjson>=3.9",
+  "pydantic>=2.0",
+  "uvloop>=0.19; platform_system != 'Windows'",
+]
+
+[project.scripts]
+flameo = "flameo.cli:main"
+
+[project.optional-dependencies]
+cache = ["redis[hiredis]>=5"]
+compression = ["brotli>=1.1", "zstandard>=0.22"]
+database = ["aiosqlite>=0.20", "asyncmy>=0.2", "asyncpg>=0.29", "oracledb>=2", "pymongo>=4.17"]
+sqlite = ["aiosqlite>=0.20"]
+mysql = ["asyncmy>=0.2", "cryptography"]
+postgres = ["asyncpg>=0.29"]
+oracle = ["oracledb>=2"]
+mongo = ["pymongo>=4.17"]
+templates = ["jinja2>=3.1"]
+test = ["aiofiles>=23", "aiosqlite>=0.20", "jinja2>=3.1", "numpy>=1.24", "pytest>=8", "pytest-asyncio>=0.23", "pytest-cov>=5"]
+
+[project.urls]
+Repository = "https://github.com/flameohq/flameo"
+Issues = "https://github.com/flameohq/flameo/issues"
+
+[tool.setuptools.packages.find]
+include = ["flameo*"]
+
+[tool.setuptools.package-data]
+flameo = ["static/**/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-ra"
+markers = [
+  "integration: requires credentials and a live external database service",
+  "performance: coarse performance regression smoke checks",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["flameo"]
+data_file = "tests/.coverage"
+omit = ["tests/*", "*/__pycache__/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+exclude_lines = [
+  "pragma: no cover",
+  "if TYPE_CHECKING:",
+  "if __name__ == .__main__.:",
+]
